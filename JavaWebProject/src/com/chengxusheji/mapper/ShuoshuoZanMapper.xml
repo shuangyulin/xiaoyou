@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ShuoshuoZanMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加说说点赞记录 -->
+	<insert id="addShuoshuoZan" parameterType="shuoshuoZan">
+		insert into t_shuoshuoZan(shuoshuoObj,userObj,zanTime) values 
+		(#{shuoshuoObj.shuoshuoId},#{userObj.user_name},#{zanTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询说说点赞记录 -->
+	<select id="queryShuoshuoZan" resultMap="shuoshuoZanMap" >
+		select t_shuoshuoZan.* from t_shuoshuoZan,t_shuoshuo,t_userInfo ${where} and t_shuoshuoZan.shuoshuoObj = t_shuoshuo.shuoshuoId and t_shuoshuoZan.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="shuoshuoZanMap" type="shuoshuoZan">
+        <id property="zanId" column="zanId" />
+        <association property="shuoshuoObj" column="shuoshuoObj" select="com.chengxusheji.mapper.ShuoshuoMapper.getShuoshuo" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有说说点赞记录 -->
+	<select id="queryShuoshuoZanList" resultMap="shuoshuoZanMap" >
+		select t_shuoshuoZan.* from t_shuoshuoZan,t_shuoshuo,t_userInfo ${where} and t_shuoshuoZan.shuoshuoObj = t_shuoshuo.shuoshuoId and t_shuoshuoZan.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的说说点赞记录数 -->
+	<select id="queryShuoshuoZanCount" resultType="int">
+		select count(*) from t_shuoshuoZan,t_shuoshuo,t_userInfo ${where} and t_shuoshuoZan.shuoshuoObj = t_shuoshuo.shuoshuoId and t_shuoshuoZan.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个说说点赞记录 -->
+	<select id="getShuoshuoZan" parameterType="int" resultMap="shuoshuoZanMap">
+		select * from t_shuoshuoZan where t_shuoshuoZan.zanId = #{zanId}
+	</select>
+
+	<!-- 更新说说点赞记录 -->
+	<update id="updateShuoshuoZan" parameterType="shuoshuoZan">
+		update t_shuoshuoZan set shuoshuoObj=#{shuoshuoObj.shuoshuoId},userObj=#{userObj.user_name},zanTime=#{zanTime} where zanId = #{zanId}
+	</update>
+
+	<!-- 删除说说点赞记录 -->
+	<delete id="deleteShuoshuoZan" parameterType="int">
+		delete from t_shuoshuoZan where zanId=#{zanId}
+	</delete>
+
+</mapper>

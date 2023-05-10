@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ZanInfoMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加文章点赞记录 -->
+	<insert id="addZanInfo" parameterType="zanInfo">
+		insert into t_zanInfo(postObj,userObj,zanTime) values 
+		(#{postObj.postInfoId},#{userObj.user_name},#{zanTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询文章点赞记录 -->
+	<select id="queryZanInfo" resultMap="zanInfoMap" >
+		select t_zanInfo.* from t_zanInfo,t_postInfo,t_userInfo ${where} and t_zanInfo.postObj = t_postInfo.postInfoId and t_zanInfo.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="zanInfoMap" type="zanInfo">
+        <id property="zanId" column="zanId" />
+        <association property="postObj" column="postObj" select="com.chengxusheji.mapper.PostInfoMapper.getPostInfo" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有文章点赞记录 -->
+	<select id="queryZanInfoList" resultMap="zanInfoMap" >
+		select t_zanInfo.* from t_zanInfo,t_postInfo,t_userInfo ${where} and t_zanInfo.postObj = t_postInfo.postInfoId and t_zanInfo.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的文章点赞记录数 -->
+	<select id="queryZanInfoCount" resultType="int">
+		select count(*) from t_zanInfo,t_postInfo,t_userInfo ${where} and t_zanInfo.postObj = t_postInfo.postInfoId and t_zanInfo.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个文章点赞记录 -->
+	<select id="getZanInfo" parameterType="int" resultMap="zanInfoMap">
+		select * from t_zanInfo where t_zanInfo.zanId = #{zanId}
+	</select>
+
+	<!-- 更新文章点赞记录 -->
+	<update id="updateZanInfo" parameterType="zanInfo">
+		update t_zanInfo set postObj=#{postObj.postInfoId},userObj=#{userObj.user_name},zanTime=#{zanTime} where zanId = #{zanId}
+	</update>
+
+	<!-- 删除文章点赞记录 -->
+	<delete id="deleteZanInfo" parameterType="int">
+		delete from t_zanInfo where zanId=#{zanId}
+	</delete>
+
+</mapper>

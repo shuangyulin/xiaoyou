@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ShuoshuoMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加说说记录 -->
+	<insert id="addShuoshuo" parameterType="shuoshuo">
+		insert into t_shuoshuo(shuoshuoContent,photo1,photo2,photo3,userObj,addTime) values 
+		(#{shuoshuoContent},#{photo1},#{photo2},#{photo3},#{userObj.user_name},#{addTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询说说记录 -->
+	<select id="queryShuoshuo" resultMap="shuoshuoMap" >
+		select t_shuoshuo.* from t_shuoshuo,t_userInfo ${where} and t_shuoshuo.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="shuoshuoMap" type="shuoshuo">
+        <id property="shuoshuoId" column="shuoshuoId" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有说说记录 -->
+	<select id="queryShuoshuoList" resultMap="shuoshuoMap" >
+		select t_shuoshuo.* from t_shuoshuo,t_userInfo ${where} and t_shuoshuo.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的说说记录数 -->
+	<select id="queryShuoshuoCount" resultType="int">
+		select count(*) from t_shuoshuo,t_userInfo ${where} and t_shuoshuo.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个说说记录 -->
+	<select id="getShuoshuo" parameterType="int" resultMap="shuoshuoMap">
+		select * from t_shuoshuo where t_shuoshuo.shuoshuoId = #{shuoshuoId}
+	</select>
+
+	<!-- 更新说说记录 -->
+	<update id="updateShuoshuo" parameterType="shuoshuo">
+		update t_shuoshuo set shuoshuoContent=#{shuoshuoContent},photo1=#{photo1},photo2=#{photo2},photo3=#{photo3},userObj=#{userObj.user_name},addTime=#{addTime} where shuoshuoId = #{shuoshuoId}
+	</update>
+
+	<!-- 删除说说记录 -->
+	<delete id="deleteShuoshuo" parameterType="int">
+		delete from t_shuoshuo where shuoshuoId=#{shuoshuoId}
+	</delete>
+
+</mapper>
